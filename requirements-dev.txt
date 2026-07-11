@@ -1,0 +1,13 @@
+# =============================================================================
+# Development Dependencies
+#
+# These packages are used for local development, testing, and analysis,
+# but are not required for the core application to run in production.
+#
+# To install: pip install -r requirements-dev.txt
+# =============================================================================
+
+jupyterlab==3.6.8
+
+# Code Quality & Formatting
+ruff==0.4.8

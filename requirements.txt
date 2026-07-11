@@ -1,0 +1,26 @@
+# =============================================================================
+# Production Dependencies
+#
+# These are the core packages required to run the application's scripts.
+# Pinning versions ensures a reproducible environment.
+#
+# To install: pip install -r requirements.txt
+# =============================================================================
+
+# Core Data & Spatial Analysis
+pandas==2.2.2
+geopandas==0.14.4
+matplotlib==3.8.4
+seaborn==0.13.2
+folium==0.17.0
+pyogrio==0.8.0
+
+# ESRI & ArcGIS Online
+arcgis==2.2.0.4
+
+# Environment Variables & Networking
+python-dotenv==1.0.1
+requests==2.31.0
+
+openpyxl # For pandas to read .xlsx files
+PyYAML

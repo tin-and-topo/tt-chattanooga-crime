@@ -1,0 +1,103 @@
+# AI Agent Configuration
+
+This document defines standard operating procedures, environmental constraints, and coding standards for AI coding agents working in `tin+topo's` repositories.
+
+These instructions are intended for Codex in VS Code and may also be followed by other coding agents such as Cline or Gemini.
+
+## Primary Objective
+
+Make the smallest safe change that satisfies the user's request while preserving the existing repository structure, coding style, and documentation format.
+
+## VS Code Repository Access
+
+- Treat the currently opened VS Code workspace folder as the active repository.
+- Use repository-relative paths in all explanations and edits.
+- Prefer direct workspace file tools for reading, searching, creating, and editing files.
+- Use open editor tabs, selected text, and visible file context when available.
+- If a needed file is not visible or accessible through workspace file tools, ask the user to confirm that the correct folder is open in VS Code or to paste the relevant file contents.
+- Do not invent file paths, repository structure, schemas, function names, or configuration values that have not been observed in the workspace or provided by the user.
+
+## Working Guidelines
+
+- Make the smallest, most efficient change that satisfies the request.
+- Preserve existing code architecture, Markdown structure, and wording unless the task explicitly asks for broader refactoring or cleanup.
+- Prefer plain Markdown and GitHub-supported syntax over custom HTML for documentation.
+- Treat documentation and shared templates as team-wide defaults; avoid unnecessary formatting churn.
+- Before editing, inspect only the files needed for the task.
+- After editing, summarize the changed files and the purpose of each change.
+
+## Documentation Updates
+
+- **Update README Date:** If you make any significant changes to the repository's code, scripts, or dependencies, update the `Last Updated: [Date]` field in `README.md` to the current date (e.g., `YYYY-MM-DD`).
+
+## Environment & Tooling Constraints
+
+- **Group Policy Block:** This local workspace environment blocks local shell and PowerShell execution.
+- **No Terminal Usage:** Do not use shell, PowerShell, Git Bash, WSL, npm, Python, git, or terminal commands to inspect, verify, preview, format, test, or read back repository changes.
+- **Direct File IO Only:** Use direct file-read, file-search, and file-write/edit tools for repository work.
+- **No Command-Based Verification:** Do not run commands such as `git diff`, `ls`, `cat`, `pwd`, `npm test`, `python`, `pytest`, `ruff`, `prettier`, or `markdownlint`.
+- **No Dependency Installation:** Do not install packages, extensions, CLIs, or system tools unless the user explicitly asks for instructions.
+- **Ask When Blocked:** If the required context cannot be accessed through VS Code file tools, ask the user for the exact path, file contents, schema, or error text.
+
+## File Editing Workflow
+
+1. Identify the relevant file or folder from the user's request.
+2. Use workspace file-search/read tools to inspect the smallest necessary context.
+3. Make targeted edits with direct file-write/edit tools.
+4. Do not perform terminal-based validation.
+5. In the final response, report:
+   - files changed;
+   - what changed;
+   - any validation not performed because terminal execution is blocked;
+   - any follow-up action the user needs to run manually.
+
+## Validation
+
+- For Markdown-only edits, mentally review heading levels, links, tables, fenced code blocks, and list indentation.
+- For JSON, YAML, TOML, GitHub Actions, and configuration files, validate syntax using internal knowledge only.
+- For code edits, inspect surrounding code for imports, naming conventions, indentation, and expected side effects.
+- Do not introduce generated artifacts, build outputs, lockfiles, logs, cache directories, or editor metadata such as `.vscode/` files unless explicitly requested.
+- If tests, formatters, builds, or linters should be run, tell the user the exact command to run manually instead of running it.
+
+## GIS & Data Handling
+
+- **No Binary Reads:** Never attempt to read binary spatial files such as `.shp`, `.dbf`, `.gdb`, `.tif`, `.img`, `.gpkg`, `.sqlite`, `.pbf`, or geodatabase contents directly into context.
+- **Large Files:** Do not read large data files such as `.csv`, `.json`, or `.geojson` over 1 MB directly into context.
+- **Schema Discovery:** If dataset structure is needed, ask the user to provide the schema, field list, metadata, or a small sample.
+- **Helper Scripts:** You may write a short Python script that prints `head()`, `info()`, fields, geometry type, CRS, or row counts, but do not run it yourself. Ask the user to run it and paste the output.
+- **Projections:** Assume spatial data uses EPSG:4326, Tennessee State Plane, or another project-standard CRS only when the repository or user states that explicitly.
+- **Spatial Logic:** Add brief comments for non-obvious spatial joins, overlays, CRS transformations, dissolves, buffers, or geometry repairs.
+
+## Script Networking Constraints
+
+- **Corporate Proxy:** TDA team members operate behind a Zscaler corporate proxy.
+- **External Requests:** When writing scripts that make external network requests, remind the user that they may need to configure the script to trust their local Zscaler certificate path.
+- **TLS Verification:** Do not recommend disabling TLS verification except as a temporary internal troubleshooting step. If mentioned, clearly label `verify=False` or equivalent settings as temporary and not appropriate for production.
+
+## Coding Standards & Preferences
+
+- **Python:** Prefer `geopandas`, `pandas`, `arcpy`, and the ArcGIS API for Python for spatial and ArcGIS workflows.
+- **Arcade:** Prefer clear, defensive Arcade expressions with explicit null handling and simple branching.
+- **Notebooks:** When editing Jupyter notebooks (`.ipynb`), modify only the exact code cells requested. Avoid broad JSON rewrites.
+- **Node.js:** Use ES6 syntax and prefer native `fetch` over third-party request libraries where practical.
+- **Documentation:** Use concise comments for complex spatial logic, projections, assumptions, or data transformations.
+- **Markdown:** Preserve existing heading style, list style, table alignment, and terminology unless the user asks for cleanup.
+
+## Git and Pull Request Behavior
+
+- Do not run `git status`, `git diff`, `git add`, `git commit`, `git push`, or other git commands.
+- Do not create branches or commits.
+- If a commit message or PR summary is requested, draft it from the edits made and clearly state that git commands were not run.
+
+## When Access Fails
+
+If repository files cannot be accessed or edited from Codex in VS Code:
+
+- Ask the user to confirm that VS Code is opened at the repository root, not a parent folder, child folder, or disconnected workspace.
+- Ask the user to open the target file in the editor or paste the relevant contents.
+- Continue using the provided content rather than attempting terminal workarounds.
+- Do not claim that files were changed unless a direct file-write/edit tool reported success.
+
+## Definition of Done
+
+A task is complete when the requested direct edits are made and the response includes a brief summary of changed files, important assumptions, and any manual validation the user should perform.

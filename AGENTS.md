@@ -32,32 +32,36 @@ Make the smallest safe change that satisfies the user's request while preserving
 
 ## Environment & Tooling Constraints
 
-- **Group Policy Block:** This local workspace environment blocks local shell and PowerShell execution.
-- **No Terminal Usage:** Do not use shell, PowerShell, Git Bash, WSL, npm, Python, git, or terminal commands to inspect, verify, preview, format, test, or read back repository changes.
-- **Direct File IO Only:** Use direct file-read, file-search, and file-write/edit tools for repository work.
-- **No Command-Based Verification:** Do not run commands such as `git diff`, `ls`, `cat`, `pwd`, `npm test`, `python`, `pytest`, `ruff`, `prettier`, or `markdownlint`.
-- **No Dependency Installation:** Do not install packages, extensions, CLIs, or system tools unless the user explicitly asks for instructions.
-- **Ask When Blocked:** If the required context cannot be accessed through VS Code file tools, ask the user for the exact path, file contents, schema, or error text.
+- **Execution Surface Matters:** Codex Desktop on managed Windows workstations may block local shell and PowerShell execution. Codex CLI running inside Ubuntu/WSL can use scoped Linux terminal commands when the user launches it from the target repo.
+- **Prefer WSL for Commands:** For command-dependent inspection, tests, formatters, package tooling, or Linux-first workflows, use the WSL terminal/Codex CLI from the repository root.
+- **Direct File IO Fallback:** If terminal execution is blocked in the current surface, use direct file-read, file-search, and file-write/edit tools for repository work.
+- **Command-Based Verification:** When command execution is available, run narrowly scoped read-only checks or project validation commands such as `git diff`, `pytest`, `ruff`, `npm test`, or relevant script help/version checks. If commands are blocked, perform manual review and report what was not run.
+- **Dependency Installation:** Do not install packages, extensions, CLIs, or system tools unless the user explicitly asks for setup or approves the install.
+- **Ask When Blocked:** If the required context cannot be accessed through available tools, ask the user for the exact path, file contents, schema, or error text.
+
 
 ## File Editing Workflow
 
 1. Identify the relevant file or folder from the user's request.
-2. Use workspace file-search/read tools to inspect the smallest necessary context.
-3. Make targeted edits with direct file-write/edit tools.
-4. Do not perform terminal-based validation.
-5. In the final response, report:
+2. Use workspace file-search/read tools or scoped WSL commands to inspect the smallest necessary context.
+3. Make targeted edits with direct file-write/edit tools or a focused patch.
+4. Run relevant validation when command execution is available and safe for the repo.
+5. If terminal execution is blocked, perform manual review instead of command-based validation.
+6. In the final response, report:
    - files changed;
    - what changed;
-   - any validation not performed because terminal execution is blocked;
+   - commands run, or validation not performed because terminal execution was blocked;
    - any follow-up action the user needs to run manually.
+
 
 ## Validation
 
-- For Markdown-only edits, mentally review heading levels, links, tables, fenced code blocks, and list indentation.
-- For JSON, YAML, TOML, GitHub Actions, and configuration files, validate syntax using internal knowledge only.
+- For Markdown-only edits, review heading levels, links, tables, fenced code blocks, and list indentation.
+- For JSON, YAML, TOML, GitHub Actions, and configuration files, validate syntax with available tooling when possible; otherwise inspect syntax carefully.
 - For code edits, inspect surrounding code for imports, naming conventions, indentation, and expected side effects.
 - Do not introduce generated artifacts, build outputs, lockfiles, logs, cache directories, or editor metadata such as `.vscode/` files unless explicitly requested.
-- If tests, formatters, builds, or linters should be run, tell the user the exact command to run manually instead of running it.
+- When command execution is available, run the narrowest meaningful test, formatter, linter, or syntax check. If commands are blocked, tell the user the exact command to run manually.
+
 
 ## GIS & Data Handling
 
@@ -85,13 +89,15 @@ Make the smallest safe change that satisfies the user's request while preserving
 
 ## Git and Pull Request Behavior
 
-- Do not run `git status`, `git diff`, `git add`, `git commit`, `git push`, or other git commands.
-- Do not create branches or commits.
-- If a commit message or PR summary is requested, draft it from the edits made and clearly state that git commands were not run.
+- Read-only git commands such as `git status`, `git diff`, `git log`, and `git show` may be used for context and validation when command execution is available.
+- Do not stage, commit, push, reset, clean, rebase, or create branches unless the user explicitly asks for that git action.
+- Never use destructive git commands to discard user work unless the user explicitly requests that exact operation.
+- If a commit message or PR summary is requested, draft it from the edits made and clearly state whether git commands were run.
+
 
 ## When Access Fails
 
-If repository files cannot be accessed or edited from Codex in VS Code:
+If repository files cannot be accessed or edited from Codex in VS Code, Codex Desktop, or Codex CLI:
 
 - Ask the user to confirm that VS Code is opened at the repository root, not a parent folder, child folder, or disconnected workspace.
 - Ask the user to open the target file in the editor or paste the relevant contents.

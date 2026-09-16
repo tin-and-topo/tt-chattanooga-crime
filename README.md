@@ -22,7 +22,7 @@ This project follows the standard `tin+topo` template structure to keep data, ex
 ├── scripts/               # Production-ready Python or Node.js scripts
 ├── .env.example           # Template for local environment variables and secrets
 ├── .gitignore             # Standard GIS ignore rules (blocks massive spatial binaries)
-├── AGENTS.md              # AI Coding Agent constraints and rules for TDF
+├── AGENTS.md and `CLAUDE.md`              # AI Coding Agent constraints and rules for TDF
 ├── README.md              # Project documentation (You are here!)
 └── requirements.txt       # Python dependencies (pandas, geopandas, arcgis, etc.)
 ```
@@ -61,7 +61,7 @@ pip install -r requirements-dev.txt
 ## AI Agent Compatibility
 
 This repository is pre-configured to work seamlessly with `tin+topo's` AI coding assistants and enterprise models.
-* Please refer to `AGENTS.md` for specific instructions on how agents should interact with this codebase.
+* Please refer to `AGENTS.md and `CLAUDE.md`` for specific instructions on how agents should interact with this codebase.
 
 ---
 

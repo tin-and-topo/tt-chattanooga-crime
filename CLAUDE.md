@@ -131,7 +131,7 @@ Before modifying hosted layers, feature services, or scheduled jobs:
 3. Prefer dry-run behavior for new scripts
 4. Never overwrite services or truncate data without explicit user confirmation
 
-Refer to `AGENTS.md` → "ArcGIS Online and Enterprise Safety" for full guardrails.
+Refer to `AGENTS.md` for the repository's operating and data-handling guardrails.
 
 ## Networking & Security
 

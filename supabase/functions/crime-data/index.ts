@@ -4,13 +4,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-interface CrimeQuery {
-  state?: string;
-  region?: string;
-  since?: number;
-  until?: number;
-  page?: number;
-}
+const ALLOWED_QUERY_PARAMETERS = new Set(["state", "region", "since", "until", "page"]);
+const UPSTREAM_TIMEOUT_MS = 10_000;
 
 Deno.serve(async (req: Request) => {
   try {
@@ -21,13 +16,20 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    if (req.method !== "GET") {
+      return new Response(JSON.stringify({ error: "Method not allowed" }), {
+        status: 405,
+        headers: { ...corsHeaders, "Content-Type": "application/json", "Allow": "GET, OPTIONS" },
+      });
+    }
+
     const url = new URL(req.url);
-    const endpoint = url.searchParams.get("endpoint") || "data";
     const apiKey = Deno.env.get("FBI_CRIME_API_KEY");
 
     if (!apiKey) {
+      console.error("FBI_CRIME_API_KEY is not configured");
       return new Response(
-        JSON.stringify({ error: "FBI API key not configured" }),
+        JSON.stringify({ error: "Crime data service is unavailable" }),
         {
           status: 500,
           headers: {
@@ -38,25 +40,40 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Build query parameters
+    // Keep the API key on the server and only proxy the endpoint and parameters
+    // required by this application. This prevents use as an arbitrary API proxy.
     const params = new URLSearchParams();
     params.append("api_key", apiKey);
 
-    const query: CrimeQuery = {};
     for (const [key, value] of url.searchParams.entries()) {
-      if (key !== "endpoint" && value) {
+      if (ALLOWED_QUERY_PARAMETERS.has(key) && value) {
         params.append(key, value);
-        query[key as keyof CrimeQuery] = isNaN(Number(value)) ? value : Number(value);
       }
     }
 
-    const apiUrl = `https://api.usa.gov/crime/fbi/cde/${endpoint}?${params.toString()}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+    const apiUrl = `https://api.usa.gov/crime/fbi/cde/data?${params.toString()}`;
 
-    const response = await fetch(apiUrl);
-    const data = await response.json();
+    let response: Response;
+    try {
+      response = await fetch(apiUrl, { signal: controller.signal });
+    } finally {
+      clearTimeout(timeout);
+    }
 
-    return new Response(JSON.stringify(data), {
-      status: response.status,
+    if (!response.ok) {
+      console.error("FBI crime API returned", response.status);
+      return new Response(JSON.stringify({ error: "Crime data service is unavailable" }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const data = await response.text();
+
+    return new Response(data, {
+      status: 200,
       headers: {
         ...corsHeaders,
         "Content-Type": "application/json",
@@ -65,9 +82,7 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error("Error:", error);
     return new Response(
-      JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
-      }),
+      JSON.stringify({ error: "Unable to retrieve crime data" }),
       {
         status: 500,
         headers: {

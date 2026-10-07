@@ -20,9 +20,11 @@ This project follows the standard `tin+topo` template structure to keep data, ex
 │   └── raw/               # Original, unaltered spatial downloads (DO NOT COMMIT to Git)
 ├── notebooks/             # Jupyter Notebooks for spatial exploration and prototyping
 ├── scripts/               # Production-ready Python or Node.js scripts
+├── src/                   # React application source code
+├── supabase/functions/    # Server-side Supabase Edge Functions
 ├── .env.example           # Template for local environment variables and secrets
 ├── .gitignore             # Standard GIS ignore rules (blocks massive spatial binaries)
-├── AGENTS.md and `CLAUDE.md`              # AI Coding Agent constraints and rules for TDF
+├── AGENTS.md and CLAUDE.md   # AI coding-agent constraints and project guidance
 ├── README.md              # Project documentation (You are here!)
 └── requirements.txt       # Python dependencies (pandas, geopandas, arcgis, etc.)
 ```
@@ -35,7 +37,7 @@ Clone this repository to your local machine (e.g., `C:\github\[project-name]`). 
 ### 2. Configure Environment Variables
 **Never commit actual credentials to GitHub.**
 1. Create a copy of `.env.example` and rename it to `.env`.
-2. Fill in your required credentials (e.g., AGOL Username, AGOL Password, API Keys) locally. 
+2. Fill in only the public Vite configuration values required by the client. Configure server-side secrets such as `FBI_CRIME_API_KEY` with Supabase secrets; do not put them in `.env` or source code.
 
 ### 3. Install Dependencies
 Install the required libraries to run this project:
@@ -46,6 +48,15 @@ pip install -r requirements.txt
 
 # To install all development tools (like JupyterLab) as well:
 pip install -r requirements-dev.txt
+```
+
+For the web application, install the locked Node.js dependencies:
+
+```sh
+npm ci
+npm run lint
+npm run typecheck
+npm run build
 ```
 
 ---
@@ -60,12 +71,12 @@ pip install -r requirements-dev.txt
 
 ## AI Agent Compatibility
 
-This repository is pre-configured to work seamlessly with `tin+topo's` AI coding assistants and enterprise models.
-* Please refer to `AGENTS.md and `CLAUDE.md`` for specific instructions on how agents should interact with this codebase.
+This repository is pre-configured to work with `tin+topo` AI coding assistants and enterprise models.
+Please refer to [AGENTS.md](AGENTS.md) and [CLAUDE.md](CLAUDE.md) for specific instructions on how agents should interact with this codebase.
 
 ---
 
 ## Point of Contact
 
 * **Project Owner:** Colin T. Stiles | cts@tinandtopo.com
-* **Last Updated:** [Date]
+* **Last Updated:** 2026-10-07

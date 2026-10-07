@@ -77,7 +77,7 @@ export default function Map() {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-        const apiUrl = `${supabaseUrl}/functions/v1/crime-data?endpoint=data&region=TN`;
+        const apiUrl = `${supabaseUrl}/functions/v1/crime-data?region=TN`;
 
         const response = await fetch(apiUrl, {
           headers: {

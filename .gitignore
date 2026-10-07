@@ -48,6 +48,16 @@ node_modules/
 .env
 .env.*
 .env.local
+!.env.example
+
+# Certificates, private keys, and local credential stores
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+.netrc
+.envrc
 
 # IDE & Editor Config
 .vscode/
@@ -63,4 +73,6 @@ ehthumbs.db
 Thumbs.db
 
 # Log files
-*.log.claude/
+*.log
+.claude/
+.codex/

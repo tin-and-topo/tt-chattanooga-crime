@@ -9,7 +9,7 @@
 
 # Core Data & Spatial Analysis
 pandas==2.2.2
-geopandas==0.14.4
+geopandas==1.2.0
 matplotlib==3.8.4
 seaborn==0.13.2
 folium==0.17.0
